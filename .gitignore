@@ -1,0 +1,15 @@
+/target/
+/html/
+classes
+.classpath
+/WebRoot/log/
+*.orig
+Thumbs.db
+*.stackdump
+.settings/
+!.gitignore
+*.iml
+.idea/
+.project
+*.iml
+
