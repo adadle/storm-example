@@ -34,8 +34,6 @@ public class StaticHostTopology {
         List<String> zkServersList = new ArrayList<String>();
         zkServersList.add(offsetZkServers);
 
-
-
         SpoutConfig kafkaConfig = new SpoutConfig(hosts,topic,offsetZkRoot,offsetZkId);
 
         kafkaConfig.zkPort = Integer.parseInt(offsetZkPort);

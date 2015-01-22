@@ -35,8 +35,7 @@ public class ZkTopology {
 
         String topic = "mars-wap";
         //以下：将offset汇报到哪个zk集群,相应配置
-//        String offsetZkServers = "10.199.203.169";
-        String offsetZkServers = "10.100.90.201";
+        String offsetZkServers = "10.199.203.169";
         String offsetZkPort = "2181";
         List<String> zkServersList = new ArrayList<String>();
         zkServersList.add(offsetZkServers);
