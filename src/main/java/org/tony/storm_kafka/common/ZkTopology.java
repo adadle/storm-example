@@ -2,13 +2,11 @@ package org.tony.storm_kafka.common;
 
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
+import backtype.storm.StormSubmitter;
+import backtype.storm.generated.AlreadyAliveException;
+import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.spout.SchemeAsMultiScheme;
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.TopologyBuilder;
-import backtype.storm.topology.base.BaseRichBolt;
-import backtype.storm.tuple.Tuple;
 import storm.kafka.KafkaSpout;
 import storm.kafka.SpoutConfig;
 import storm.kafka.StringScheme;
@@ -16,7 +14,6 @@ import storm.kafka.ZkHosts;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by TonyLee on 2015/1/15.
@@ -33,9 +30,7 @@ public class ZkTopology {
 
         //这个地方其实就是kafka配置文件里边的zookeeper.connect这个参数，可以去那里拿过来。
         String brokerZkStr = "10.100.90.201:2181/kafka_online_sample";
-
         String brokerZkPath = "/brokers";
-
         ZkHosts zkHosts = new ZkHosts(brokerZkStr, brokerZkPath);
 
         String topic = "mars-wap";
@@ -52,12 +47,9 @@ public class ZkTopology {
 
 
         SpoutConfig kafkaConfig = new SpoutConfig(zkHosts, topic, offsetZkRoot, offsetZkId);
-        kafkaConfig.zkRoot = offsetZkRoot;
         kafkaConfig.zkPort = Integer.parseInt(offsetZkPort);
         kafkaConfig.zkServers = zkServersList;
-        kafkaConfig.id = offsetZkId;
         kafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
-
 
         KafkaSpout spout = new KafkaSpout(kafkaConfig);
 
@@ -67,40 +59,19 @@ public class ZkTopology {
 
         Config config = new Config();
 
-        LocalCluster cluster = new LocalCluster();
-        cluster.submitTopology("test", config, builder.createTopology());
-
-        // cluster submit.
-//        try {
-//            StormSubmitter.submitTopology("storm-kafka-example",config,builder.createTopology());
-//        } catch (AlreadyAliveException e) {
-//            e.printStackTrace();
-//        } catch (InvalidTopologyException e) {
-//            e.printStackTrace();
-//        }
-
-    }
-}
-
-class Bolt extends BaseRichBolt {
-    @Override
-    public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-
-    }
-
-    @Override
-    public void execute(Tuple tuple) {
-        String log = tuple.getString(0);
-        System.out.println("--->" + log);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if(args.length > 0){
+            // cluster submit.
+            try {
+                StormSubmitter.submitTopology("storm-kafka-example", config, builder.createTopology());
+            } catch (AlreadyAliveException e) {
+                e.printStackTrace();
+            } catch (InvalidTopologyException e) {
+                e.printStackTrace();
+            }
+        }else{
+            LocalCluster cluster = new LocalCluster();
+            cluster.submitTopology("test", config, builder.createTopology());
         }
     }
-
-    @Override
-    public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-
-    }
 }
+
