@@ -24,17 +24,18 @@ public class KafkaBoltTestTopology {
 
         TopologyBuilder builder = new TopologyBuilder();
 
+        //1. KafkaBolt的前置组件emit出来的(可以是spout也可以是bolt)
         Spout spout = new Spout(new Fields("key", "message"));
         builder.setSpout("spout", spout);
 
+        //2. 给KafkaBolt配置topic及前置tuple消息到kafka的mapping关系
         KafkaBolt bolt = new KafkaBolt();
         bolt.withTopicSelector(new DefaultTopicSelector("tony-S2K"))
             .withTupleToKafkaMapper(new FieldNameBasedTupleToKafkaMapper());
-
         builder.setBolt("forwardToKafka", bolt, 1).shuffleGrouping("spout");
 
         Config conf = new Config();
-        //set producer properties.
+        //3. 设置kafka producer的配置
         Properties props = new Properties();
         props.put("metadata.broker.list", "10.100.90.203:9092");
         props.put("producer.type","async");
@@ -55,8 +56,6 @@ public class KafkaBoltTestTopology {
         }else{
             new LocalCluster().submitTopology("kafkaboltTest", conf, builder.createTopology());
         }
-
-
 
     }
 }
